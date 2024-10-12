@@ -6,3 +6,4 @@ You can also try out directly the framework by installing the [prime_adj](https:
 
 To be updated shortly.
 
+![PAM](https://github.com/user-attachments/assets/6d1ea694-a58d-4f8d-8423-062f22f27819)
