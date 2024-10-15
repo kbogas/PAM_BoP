@@ -32,13 +32,13 @@ dataset_list = [
 ]
 
 # Number of runs
-num_runs = 1
+num_runs = 5
 
 # Device to use (by default CPU, but can use GPU for CatBoost training)
 device = "GPU"  # feel free to change to "GPU" if available
 
 # Maximum number of hops to do for PAMs
-k = 5
+k = 4
 
 # Alpha for self BoP feature vector weighting when aggregating neigbhorhood
 alpha = 2
@@ -55,7 +55,7 @@ res = []
 root_path = "./"
 
 path_out = os.path.join(
-    root_path, f"./results/{'_'.join(dataset_list)}_{num_runs}_runs.csv"
+    root_path, f"./results/{'_'.join(dataset_list)}_{num_runs}_runs.txt"
 )
 
 

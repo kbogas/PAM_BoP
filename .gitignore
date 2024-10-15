@@ -162,5 +162,4 @@ cython_debug/
 #.idea/
 # all data
 *.csv
-*/catboost_info
-*/results/*
+*/catboost_info/*
