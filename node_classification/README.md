@@ -11,4 +11,9 @@ pip install -r requirements.txt
 Finally, you can run **bop_node_classification.py** to run for the BoP + CatBoost model for the node classification task. 
 Remember to change the user input values in lines 22-42, according to the dataset/-s you wish to run for.
 
+```cmd
+python bop_node_classification.py
+```
+
+
 For questions, contact bogas.ko [at] gmail [dot] com.
