@@ -188,8 +188,8 @@ def create_pam_matrices(
     max_order: int = 5,
     use_log: bool = True,
     method: str = "plus_times",
-    spacing_strategy: str = "step_10",
-    eliminate_zeros: bool = False,
+    spacing_strategy: str = "step_100",
+    eliminate_zeros: bool = True,
     break_with_sparsity_threshold: float = -1,
     print_: bool = False,
 ) -> tuple[csr_array, list[csr_array], dict, dict, bool]:
@@ -203,11 +203,12 @@ def create_pam_matrices(
         use_log (bool, optional): Whether to use log of primes for numerical stability.
         Defaults to True.
         spacing_strategy (str, optional): he spacing strategy as mentioned in get_prime_map_from_rel.
-        Defaults to "step_10".
+        Defaults to "step_100".
+        eliminate_zeros (bool, optional): Whether to eliminate zeros between matrix hops.
+        Defaults to True.
         break_with_sparsity_threshold (int, optional): The percentage of sparsity that is not accepted.
         If one of the k-hop PAMs has lower sparsity we break the calculations and do not include it
         in the returned matrices list.
-        Defaults to "step_10"
 
     Returns:
         tuple[csr_matrix, list[csr_matrix], dict, dict]: The first argument is the lossless 1-hop PAM with products.
@@ -309,8 +310,8 @@ def create_pam_matrices(
         if eliminate_zeros:
             updated_power_gb.setdiag(0)
         updated_power = gb.io.to_scipy_sparse(updated_power_gb)
-        # updated_power.sort_indices()
-        # updated_power.eliminate_zeros()
+        updated_power.sort_indices()
+        updated_power.eliminate_zeros()
 
         sparsity = get_sparsity(updated_power)
         if print_:
