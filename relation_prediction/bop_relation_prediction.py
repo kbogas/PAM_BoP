@@ -68,6 +68,7 @@ runs_to_do = {
 
 ######################## END USER SELECTION #######################################
 
+
 total_results = []
 for run_name, run_settings in runs_to_do.items():
     dataset_name = run_settings["dataset"]
@@ -76,6 +77,8 @@ for run_name, run_settings in runs_to_do.items():
     method = run_settings["method"]
     max_order = run_settings["max_order"]
     sim_pairs = run_settings["sim_pairs"]
+
+    print(f"\n Running on {dataset_name} with {method} method...")
 
     # Loading the data
     time_s = time.time()
@@ -95,11 +98,12 @@ for run_name, run_settings in runs_to_do.items():
     time_prev = time.time()
     time_needed = time_prev - time_s
     print(
-        f"Total time for reading: {time_needed:.5f} secs ({time_needed/60:.2f} mins)\n"
+        f"\nTotal time for reading: {time_needed:.5f} secs ({time_needed/60:.2f} mins)\n"
     )
 
     time_s = time.time()
 
+    # Generate PAMs
     if method == "lossy":
         (
             pam_1hop_lossless,
@@ -134,9 +138,10 @@ for run_name, run_settings in runs_to_do.items():
     time_prev = time.time()
     time_needed = time_prev - time_s
     print(
-        f"Total time for P^{max_order}: {time_needed:.5f} secs ({time_needed/60:.2f} mins)\n"
+        f"\nTotal time for creating PAMs up to P^{max_order}: {time_needed:.5f} secs ({time_needed/60:.2f} mins)\n"
     )
 
+    print(f"Generating train + test features..\n")
     # Map the initial data to node indices and relation primes
     df_train_mapped = df_train.copy()
     df_train_mapped["rel"] = df_train["rel"].map(rel2id)
@@ -145,9 +150,8 @@ for run_name, run_settings in runs_to_do.items():
 
     df_train_mapped.dropna(inplace=True)
 
-    # Create the features of the paths for the original train pairs
-    features_ij, labels_ij = {}, {}
-
+    # In case of the lossless algo, keep track of the actual feature
+    # vocabulary (i.e. all the expressed relational chains (r1, r2, r2) ...)
     if method == "lossless":
         value2indices = {}
 
@@ -171,8 +175,10 @@ for run_name, run_settings in runs_to_do.items():
             unq_path_total += len(unq_paths)
             print(f"Hop {hop}, UNQ: {len(unq_paths)}")
 
-        print(f"Total Feats: {sum(num_feats_per_hop.values())}")
-        print(f"Total UNQ: {unq_path_total}")
+        print(f"Total unique paths/features: {unq_path_total}\n")
+
+    # Create the features of the paths for all train pairs
+    features_ij, labels_ij = {}, {}
 
     if method == "lossless":
         node_feats = np.empty((len(unique_nodes), 2 * unq_path_total))
@@ -213,24 +219,21 @@ for run_name, run_settings in runs_to_do.items():
             [row["rel"]]
         )
 
-    print(f"Feats, shapes: {node_feats.shape}")
+    print(f"Node feats shapes: {node_feats.shape}\n")
 
     X_train = []
     y_train = []
     train_pairs = []
 
-    add_inverse_pair_features = True
-
     for ij, ij_feature_dict in features_ij.items():
         cur_features_pair = ij_feature_dict
-        if add_inverse_pair_features:
-            try:
-                cur_features_inverse = features_ij[(ij[1], features_ij[0])]
-            except KeyError:
-                if method == "lossless":
-                    cur_features_inverse = np.zeros((total_feats,))
-                else:
-                    cur_features_inverse = np.zeros((max_order,))
+        try:
+            cur_features_inverse = features_ij[(ij[1], features_ij[0])]
+        except KeyError:
+            if method == "lossless":
+                cur_features_inverse = np.zeros((total_feats,))
+            else:
+                cur_features_inverse = np.zeros((max_order,))
 
             cur_features_pair = np.hstack(
                 (cur_features_pair, cur_features_inverse)
@@ -258,7 +261,7 @@ for run_name, run_settings in runs_to_do.items():
         ohe = OneHotEncoder(handle_unknown="ignore")
         X_train_ohe = ohe.fit_transform(X_train)  # np.array(X_train)  #
 
-    print(f"Extracted features for the train pairs {X_train_ohe.shape} ...")
+    print(f"Generated features for the train pairs {X_train_ohe.shape}.\n")
 
     # Repeat the same feature extraction procedure for the test data
     df_test_mapped = df_test.copy()
@@ -273,6 +276,7 @@ for run_name, run_settings in runs_to_do.items():
             df_test_mapped["tail"].astype(int).values,
         )
     )
+
     X_test = []
     y_test = []
     count_no_features = 0
@@ -298,21 +302,20 @@ for run_name, run_settings in runs_to_do.items():
                             cur_dict[offset + index] += 1
                 else:
                     cur_dict[cur_hop] = cur_value
-            if add_inverse_pair_features:
-                cur_value = cur_power[row["ij"][1], row["ij"][0]]
-                if cur_value > 0:
-                    if method == "lossless":
+            cur_value = cur_power[row["ij"][1], row["ij"][0]]
+            if cur_value > 0:
+                if method == "lossless":
 
-                        if cur_hop == 0:
-                            factors = factorint(cur_value, multiple=True)
-                        else:
-                            factors = [cur_value]
-                        offset = num_feats_per_hop[cur_hop]
-                        for value in factors:
-                            for index in value2indices[cur_hop + 1][value]:
-                                cur_dict[total_feats + offset + index] += 1
+                    if cur_hop == 0:
+                        factors = factorint(cur_value, multiple=True)
                     else:
-                        cur_dict[cur_hop + max_order] = cur_value
+                        factors = [cur_value]
+                    offset = num_feats_per_hop[cur_hop]
+                    for value in factors:
+                        for index in value2indices[cur_hop + 1][value]:
+                            cur_dict[total_feats + offset + index] += 1
+                else:
+                    cur_dict[cur_hop + max_order] = cur_value
 
             cur_features_nodes = np.hstack(
                 (
@@ -329,12 +332,11 @@ for run_name, run_settings in runs_to_do.items():
 
     if method == "lossless":
         X_test_ohe = X_test
-        # X_test_ohe = X_test[:, indices_to_keep]
         X_test_ohe = csr_array(X_test_ohe)
     else:
         X_test_ohe = ohe.transform(X_test)  # X_test  #
 
-    print(f"Extracted features for the test pairs {X_test_ohe.shape}...\n")
+    print(f"Generated features for the test pairs {X_test_ohe.shape}.\n")
 
     # from sklearn.neighbors import KNeighborsClassifier
 
@@ -361,8 +363,11 @@ for run_name, run_settings in runs_to_do.items():
     #     }
     #     res.append(cur_res)
 
-    print(f"Distances between {X_test_ohe.shape} and {X_train_ohe.shape}")
+    print(
+        f"Calculate pairwise distances between {X_test_ohe.shape[0]} (test) pairs and {X_train_ohe.shape[0]} (train) pairs.\n"
+    )
     distances = pairwise_distances(X_test_ohe, X_train_ohe, metric="manhattan")
+    # Find closest train pairs for each test case
     sorted_ids = np.argsort(distances, axis=1)
 
     # Keep track of already seen relations between pairs, to exclude them from predictions
@@ -381,7 +386,7 @@ for run_name, run_settings in runs_to_do.items():
     train_pairs = np.array(train_pairs)
 
     # For each test pair keep their most similar pair
-    print(f"Iterating over tests")
+    print(f"Iterating over test samples and predicting:")
     for i_test, similar_pairs in enumerate(sorted_ids[:, :sim_pairs]):
         cur_row = df_test_mapped.iloc[i_test]
 
@@ -432,7 +437,7 @@ for run_name, run_settings in runs_to_do.items():
     total_results.append(
         [method, dataset_name] + list(pr_results.values()) + [time_taken]
     )
-    print(f"\n")
+    print(f"\n\n")
 
 
 df = pd.DataFrame(

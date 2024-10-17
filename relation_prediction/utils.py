@@ -52,7 +52,6 @@ def load_data(
     df_train.columns = ["head", "rel", "tail"]
     df_train_orig = df_train.copy()
     if "YES" in add_inverse_edges:
-        print(f"Will add the inverse train edges as well..")
         df_train["rel"] = df_train["rel"].astype(str)
         df_train_inv = df_train.copy()
         df_train_inv["head"] = df_train["tail"]
@@ -96,7 +95,7 @@ def load_data(
             df_train.to_records(index=False).tolist()
             + df_eval.to_records(index=False).tolist()
         )
-    print(f"Total: {len(already_seen_triples)} triples in train + eval!)")
+    print(f"Dataset details:")
     print(f"In train: {len(df_train)}")
     print(f"In valid: {len(df_eval)}")
     print(f"In test: {len(df_test)}")
