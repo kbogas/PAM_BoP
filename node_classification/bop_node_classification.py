@@ -41,7 +41,7 @@ device = "GPU"  # feel free to change to "GPU" if available
 k = 4
 
 # Alpha for self BoP feature vector weighting when aggregating neigbhorhood
-alpha = 2
+alpha = 1
 
 ############################## END USER SELECTION ####################################
 

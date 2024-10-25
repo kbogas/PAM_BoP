@@ -64,6 +64,30 @@ def process_data_peptides(data, max_order):
     return pam_powers, label.cpu().numpy()
 
 
+def generate_pams_zinc(g, max_order):
+    triples = torch.vstack(
+        (g.ndata["feat"][g.edges()[0]], g.edata["feat"], g.ndata["feat"][g.edges()[1]])
+    ).T @ torch.tensor([100, 10, 1])
+    source, dest = g.edges()
+    source = source.cpu().numpy()
+    dest = dest.cpu().numpy()
+    df = pd.DataFrame({"head": source, "rel": triples, "tail": dest})
+    pam_1hop_lossless, pam_powers, node2id, rel2id, broke_cause_of_sparsity = (
+        create_pam_matrices(
+            df,
+            max_order=max_order,
+        )
+    )
+    return [pam_power.data for pam_power in pam_powers]
+
+
+def process_data_zinc(data, max_order):
+
+    (g, label) = data
+    pam_powers = generate_pams_zinc(g, max_order)
+    return pam_powers, label.cpu().numpy()
+
+
 class BoP_peptides(BaseEstimator, TransformerMixin):
     "Simple sklearn-based Tf-idf Vectorizer for the nnz BoP Values"
 
