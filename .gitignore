@@ -166,3 +166,4 @@ cython_debug/
 /relation_prediction/data/*/train.txt
 /relation_prediction/data/*/valid.txt
 /relation_prediction/data/*/test.txt
+/graph_regression/data/*

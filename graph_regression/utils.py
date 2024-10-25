@@ -1,11 +1,12 @@
 import random
 import time
 
+import datasets
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 import torch
-from scipy.sparse import csr_array
+from scipy.sparse import csr_array, csr_matrix
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sympy.ntheory import nextprime
@@ -65,17 +66,24 @@ def process_data_peptides(data, max_order):
 
 
 def generate_pams_zinc(g, max_order):
-    triples = torch.vstack(
+    # rels = torch.vstack(
+    #     (g.ndata["feat"][g.edges()[0]], g.edata["feat"], g.ndata["feat"][g.edges()[1]])
+    # ).T @ torch.tensor([1000, 100, 1])
+    rels = torch.vstack(
         (g.ndata["feat"][g.edges()[0]], g.edata["feat"], g.ndata["feat"][g.edges()[1]])
-    ).T @ torch.tensor([100, 10, 1])
+    ).T
+    rels = np.apply_along_axis(lambda x: "_".join(x), 1, rels.numpy().astype(str))
     source, dest = g.edges()
     source = source.cpu().numpy()
     dest = dest.cpu().numpy()
-    df = pd.DataFrame({"head": source, "rel": triples, "tail": dest})
+    df = pd.DataFrame({"head": source, "rel": rels, "tail": dest})
     pam_1hop_lossless, pam_powers, node2id, rel2id, broke_cause_of_sparsity = (
         create_pam_matrices(
             df,
             max_order=max_order,
+            method="plus_plus",
+            spacing_strategy="step_1",
+            use_log=False,
         )
     )
     return [pam_power.data for pam_power in pam_powers]
