@@ -95,9 +95,6 @@ Hits@10: 0.9702
      method dataset       mrr       h@1       h@3      h@10   time_sec
 1  lossless  WN18RR  0.875268  0.782490  0.966484  0.970246  36.574776
 0     lossy  WN18RR  0.816426  0.685021  0.946306  0.958960  25.056702
-
-'''
-
-
+```
 
 For questions, contact bogas.ko [at] gmail [dot] com.

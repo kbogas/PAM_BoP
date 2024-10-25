@@ -51,8 +51,7 @@ Node Features shape: (2027, 10000).
 
 Acc ± 1*std
 acc    0.9222222222222222 ± 0.0362177911400147
-
-'''
+```
 
 As seen the time taken to generate k-hop PAMs is usually than a second.
 
