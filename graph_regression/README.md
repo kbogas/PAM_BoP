@@ -41,4 +41,6 @@ Train MAE: 0.1826
 Test MAE: 0.2493
 ```
 
+As seen the PAM and BoP generation process is less than 2 minutes.
+
 For questions, contact bogas.ko [at] gmail [dot] com.
