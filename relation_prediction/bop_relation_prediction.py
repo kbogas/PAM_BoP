@@ -338,31 +338,6 @@ for run_name, run_settings in runs_to_do.items():
 
     print(f"Generated features for the test pairs {X_test_ohe.shape}.\n")
 
-    # from sklearn.neighbors import KNeighborsClassifier
-
-    # id2rel = {v: k for k, v in rel2id.items()}
-    # y_train_one = [id2rel[y[0]] for y in y_train]
-
-    # y_test_one = [id2rel[y[0]] for y in y_test]
-
-    # clf = KNeighborsClassifier(n_neighbors=sim_pairs, n_jobs=30, metric="manhattan")
-    # clf.fit(X_train_ohe, y_train_one)
-    # probas = clf.predict_proba(X_test_ohe)
-    # res = []
-    # for i_test, cur_row in df_test_mapped.reset_index().iterrows():
-    #     cur_probas = probas[i_test]
-    #     sorted_indices = np.argsort(cur_probas)[::-1]
-    #     pred_labels = clf.classes_[sorted_indices].tolist()
-    #     proba_labels = cur_probas[sorted_indices].tolist()
-    #     rank = pred_labels.index(id2rel[cur_row["rel"]]) + 1
-    #     cur_res = {
-    #         "predicted": pred_labels,
-    #         "probas": proba_labels,
-    #         "rank": rank,
-    #         **cur_row,
-    #     }
-    #     res.append(cur_res)
-
     print(
         f"Calculate pairwise distances between {X_test_ohe.shape[0]} (test) pairs and {X_train_ohe.shape[0]} (train) pairs.\n"
     )
