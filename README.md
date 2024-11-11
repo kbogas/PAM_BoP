@@ -8,7 +8,10 @@ Accompanying code (and source of data) for the work on [PAMs](https://github.com
 
 For each task, node classification, relation prediction and graph regression, the corresponding folder contains the scripts needed to reproduce the results presented in the paper.
 
-An [accompanyning demo](http://143.233.226.63:5000/) showcasing how we can use Bag of Paths to embed the [HetioNet](https://het.io/) Knowledge Graph. We show a TSNE 2-d projection of the BoPs feature vectors of pairs from HetioNet, alongside a tool to find similar pairs given specific head-tail entities.
+![Demo](https://github.com/user-attachments/assets/775d8808-743a-4065-b15a-3689a5d45523)
+
+
+An [accompanyning demo](http://143.233.226.63:5000/) showcases how we can use Bag of Paths to embed the [HetioNet](https://het.io/) Knowledge Graph. We show a TSNE 2-d projection of the BoPs feature vectors of pairs from HetioNet, alongside a tool to find similar pairs given specific head-tail entities.
 
 We use publicly available datasets in our experiments. We zipped together the data for convenience for the node classification and relation prediction tasks, while for the graph regression we utilize commonly-used python modules for data loading.
 
