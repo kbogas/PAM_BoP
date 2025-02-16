@@ -89,7 +89,7 @@ for dataset in dataset_list:
         f"For efficiency will focus on {len(wanted_label_nodes)} nodes. (The labeled nodes + their 1-hop neighbors)\n"
     )
 
-    # Pring generate pams
+    # Generate pams, focusing on the nodes that we want to predict on for efficiency on big graphs
     time_s = time.time()
     pams, node2id, rel2id, _ = create_pam_matrices_with_start_and_end(
         df_train,

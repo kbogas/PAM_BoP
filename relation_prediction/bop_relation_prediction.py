@@ -23,33 +23,33 @@ set_all_seeds(random_state)
 
 ############################## USER SELECTION #######################################
 
-root_path_to_data = "./data"
-path_to_save_res = "./results/lossy_and_lossless_WN18RR_dataset_runs.txt"
+root_path_to_data = "../../Prime_Adj/data/"
+path_to_save_res = "./results/lossy_and_lossless_ddb14.txt"
 
 runs_to_do = {
-    "WN18RR_lossy": {
-        "dataset": "WN18RR",
+    "DDB14_lossy": {
+        "dataset": "DDB14",
         "method": "lossy",
-        "max_order": 5,
-        "sim_pairs": 100,
+        "max_order": 3,
+        "sim_pairs": 20,
     },
-    "WN18RR_lossless": {
-        "dataset": "WN18RR",
+    "DDB14_lossless": {
+        "dataset": "DDB14",
         "method": "lossless",
-        "max_order": 2,
-        "sim_pairs": 100,
+        "max_order": 1,
+        "sim_pairs": 20,
     },
-    # "DDB14_lossy": {
-    #     "dataset": "DDB14",
+    # "WN18RR_lossy": {
+    #     "dataset": "WN18RR",
     #     "method": "lossy",
-    #     "max_order": 3,
-    #     "sim_pairs": 20,
+    #     "max_order": 5,
+    #     "sim_pairs": 100,
     # },
-    # "DDB14_lossless": {
-    #     "dataset": "DDB14",
+    # "WN18RR_lossless": {
+    #     "dataset": "WN18RR",
     #     "method": "lossless",
-    #     "max_order": 1,
-    #     "sim_pairs": 20,
+    #     "max_order": 2,
+    #     "sim_pairs": 100,
     # },
     # "NELL995_lossy": {
     #     "dataset": "NELL995",

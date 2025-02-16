@@ -46,4 +46,6 @@ y_pred = pipe.predict(test_graphs)
 
 print(f"Train MAE: {mean_absolute_error(y_train, y_train_pred):.4f}")
 print(f"Test MAE: {mean_absolute_error(y_test, y_pred):.4f}")
-print(f"Time taken: {(time.time() - time_s)/60:.2f} mins")
+print(
+    f"\nTime taken:  {time.time()-time_s:.2f} seconds ({(time.time()-time_s)/60:.2f} mins)"
+)
