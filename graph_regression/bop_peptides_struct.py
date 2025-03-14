@@ -5,6 +5,7 @@ from functools import partial
 import numpy as np
 import tqdm
 from catboost import CatBoostRegressor, Pool
+from dgl.data.lrgb import PeptidesStructuralDataset
 from scipy.sparse import csr_matrix
 from scipy.sparse import hstack as sparse_hstack
 from sklearn.feature_selection import SelectFromModel
@@ -12,8 +13,6 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import DecisionTreeRegressor
 from utils import BoP_peptides, process_data_peptides, set_all_seeds
-
-from dgl.data.lrgb import PeptidesStructuralDataset
 
 ############################## USER SELECTION #######################################
 
@@ -107,8 +106,7 @@ y_valid = all_labels[dataset.get_idx_split()["val"].cpu().numpy()]
 y_test = all_labels[dataset.get_idx_split()["test"].cpu().numpy()]
 
 
-time_s = time.time()
-print("Feature selection...")
+print("Keeping 10000 paths...")
 
 # Keep only 10000 paths
 fs = SelectFromModel(
@@ -117,11 +115,6 @@ fs = SelectFromModel(
 val_graphs = fs.fit_transform(val_graphs, y_valid)
 train_graphs = fs.transform(train_graphs)
 test_graphs = fs.transform(test_graphs)
-
-
-print(
-    f"Feature selection took : {time.time()-time_s:.2f} seconds ({(time.time()-time_s)/60:.2f} mins)"
-)
 
 
 time_s = time.time()

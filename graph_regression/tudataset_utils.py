@@ -12391,8 +12391,7 @@ class PAMs_from_ZINC(BaseEstimator, TransformerMixin):
         self,
         power=5,
         use_log=False,
-        add_symmetric=False,
-        step="step_1",
+        step="step_10",
         semiring: str = "plus_plus",
         eliminate_diagonal: bool = False,
     ):
@@ -12400,10 +12399,8 @@ class PAMs_from_ZINC(BaseEstimator, TransformerMixin):
         self.use_log = use_log
         self.power = power
         self.step = step
-        self.add_symmetric = add_symmetric
         self.semiring = semiring
         self.eliminate_diagonal = eliminate_diagonal
-        # self.vector = CountVectorizer(binary=False, tokenizer=lambda doc: doc, lowercase=False, min_df=3, max_df= 0.9)
 
     def fit(self, X, y=None):
         self.triple2prime = {}
@@ -12438,16 +12435,7 @@ class PAMs_from_ZINC(BaseEstimator, TransformerMixin):
 
                 values.append(rel_value)
 
-            if self.add_symmetric:
-                csr_ = csr_array(
-                    (
-                        values + values,
-                        (np.concatenate((rows, cols)), np.concatenate((cols, rows))),
-                    ),
-                    shape=x.adj.shape,
-                )
-            else:
-                csr_ = csr_array((values, (rows, cols)), shape=x.adj.shape)
+            csr_ = csr_array((values, (rows, cols)), shape=x.adj.shape)
             power_A = self.get_pam_powers(csr_)
             self.train_PAMS.append(power_A)
         return self
@@ -12479,21 +12467,7 @@ class PAMs_from_ZINC(BaseEstimator, TransformerMixin):
                 except KeyError:
                     pass
 
-            if self.add_symmetric:
-                csr_ = csr_array(
-                    (
-                        values + values,
-                        (
-                            np.concatenate((rows_to_keep, cols_to_keep)),
-                            np.concatenate((cols_to_keep, rows_to_keep)),
-                        ),
-                    ),
-                    shape=x.adj.shape,
-                )
-            else:
-                csr_ = csr_array(
-                    (values, (rows_to_keep, cols_to_keep)), shape=x.adj.shape
-                )
+            csr_ = csr_array((values, (rows_to_keep, cols_to_keep)), shape=x.adj.shape)
             power_A = self.get_pam_powers(csr_)
             features.append(power_A)
         return features  # self.vector.transform(features)
